@@ -12,12 +12,11 @@
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.efi.canTouchEfiVariables = false; # true won't write LoaderSystemToken on my ASUS-Board
 
   networking.hostName = "nixos-hendrik"; # Define your hostname.
   # Pick only one of the below networking options.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
@@ -30,34 +29,43 @@
     keyMap = "de-latin1";
   };
 
-  services.xserver.enable = true;
+  services.xserver = {
+    enable = true;
+    layout = "de";
+  };
   services.xserver.displayManager.gdm.enable = true;
   programs.hyprland = {
     enable = true;
   };
 
-
-
-  # Configure keymap in X11
-  # services.xserver.layout = "us";
   # services.xserver.xkbOptions = "eurosign:e,caps:escape";
 
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
   # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
+  sound.enable = true;
+  hardware.pulseaudio.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
  users.users.hmaier = {
+   uid = 1001;
    isNormalUser = true;
    initialPassword = "hmaier";
    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
  };
+
+ fileSystems."/home/hmaier/share" = {
+   device = "//192.168.178.99/nas/private_hdd/Share";
+   fsType = "cifs";
+   options = ["uid=1001" "gid=1001" "pass=sharingiscaring" "user=share"];
+
+ };
+
+
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -76,6 +84,9 @@
      rofi-wayland
      nerdfonts
      cifs-utils
+     doas
+     lsb-release
+
    ];
 
 programs.neovim = {
