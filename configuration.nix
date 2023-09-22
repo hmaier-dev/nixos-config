@@ -7,7 +7,7 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+      /etc/nixos/hardware-configuration.nix
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -20,7 +20,6 @@
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
-
 
   # Select internationalisation properties.
   i18n.defaultLocale = "de_DE.UTF-8";
@@ -86,6 +85,8 @@
      cifs-utils
      doas
      lsb-release
+     bspwm
+     sxhkd
 
    ];
 
