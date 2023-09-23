@@ -10,37 +10,50 @@
       /etc/nixos/hardware-configuration.nix
     ];
 
-  # Use the systemd-boot EFI boot loader.
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false; # true won't write LoaderSystemToken on my ASUS-Board
 
   networking.hostName = "nixos-hendrik"; # Define your hostname.
-  # Pick only one of the below networking options.
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
-  # Set your time zone.
-  time.timeZone = "Europe/Berlin";
-
+  time.timeZone = "Europe/Berlin"; # Set your time zone.
   # Select internationalisation properties.
   i18n.defaultLocale = "de_DE.UTF-8";
   console = {
     font = "Lat2-Terminus16";
     keyMap = "de-latin1";
   };
-
   services.xserver = {
+
     enable = true;
     layout = "de";
-  };
-  services.xserver.displayManager.gdm.enable = true;
-  programs.hyprland = {
-    enable = true;
+    xkbOptions = "eurosign:e,caps:escape";
+    
+    desktopManager.xfce = {
+      enable = true;
+      enableXfwm = false;
+    };
+    windowManager.bspwm = {
+      enable = true;
+      configFile = "/home/hmaier/.config/bspwm/bspwmrc";
+      sxhkd.configFile = "/home/hmaier/.config/sxhkd/sxhkdrc";
+    };
+    displayManager.sessionCommands = ''
+      ${pkgs.bspwm}/bin/bspc wm -r 
+      source $HOME/.config/bspwm/bspwmrc
+    '';
+    displayManager.lightdm = {
+      enable = true;
+    };
+
   };
 
-  # services.xserver.xkbOptions = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
+#  services.xserver.displayManager.gdm.enable = true;
+#  programs.hyprland = {
+#    enable = true;
+#  };
 
   # Enable sound.
   sound.enable = true;
@@ -69,52 +82,64 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
    environment.systemPackages = with pkgs; [
-     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-     wget
-     neofetch
+
+     bat
+     brave
+     bspwm
+     cifs-utils
      curl
-     openssl
+     doas
+     exa
+     feh
+     fzf
      git
      htop
-     python3
-     exa
-     waybar
      kitty
-     rofi-wayland
-     nerdfonts
-     cifs-utils
-     doas
+     lightdm
      lsb-release
-     bspwm
+     mate.mate-polkit
+     neofetch
+     nerdfonts
+     openssl
+     polybar
+     python3
+     rofi-wayland
+     scrot
      sxhkd
+     vim 
+	 neovim
+     waybar
+     wget
+     xclip
+     xfce.thunar
+     xfce.xfce4-terminal
+     yt-dlp
+     zathura
 
    ];
 
-programs.neovim = {
-  enable = true;
-  defaultEditor = true;
-  configure = {
-	customRC = ''
-	  colorscheme pablo
-	  set number relativenumber
-	  '';
-  };
-};
+#  programs.neovim = {
+#    enable = true;
+#    defaultEditor = true;
+#    configure = {
+#  	customRC = ''
+#  	  colorscheme pablo
+#  	  set number relativenumber
+#  	  '';
+#    };
+#  };
 
+  fonts.fonts = (with pkgs; [
+    source-code-pro
+  ]);
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  
+
 
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
