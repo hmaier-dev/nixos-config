@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports =
@@ -16,7 +16,14 @@
   boot.loader.efi.canTouchEfiVariables = false; # true won't write LoaderSystemToken on my ASUS-Board
 
   networking.hostName = "nixos-hendrik"; # Define your hostname.
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.dhcpcd = {
+	enable = true;
+	extraConfig = ''
+		static ip_address=192.168.178.104/24
+		static routers=192.168.178.1
+	'';
+  };
 
   time.timeZone = "Europe/Berlin"; # Set your time zone.
   # Select internationalisation properties.
@@ -40,14 +47,18 @@
       configFile = "/home/hmaier/.config/bspwm/bspwmrc";
       sxhkd.configFile = "/home/hmaier/.config/sxhkd/sxhkdrc";
     };
-    displayManager.sessionCommands = ''
-      ${pkgs.bspwm}/bin/bspc wm -r 
-      source $HOME/.config/bspwm/bspwmrc
-    '';
     displayManager.lightdm = {
       enable = true;
     };
+    displayManager.sessionCommands = ''
+      source $HOME/.config/bspwm/bspwmrc
+      ${pkgs.bspwm}/bin/bspc wm -r 
+    '';
 
+    # displayManager.sessionCommands = ''
+    #   ${pkgs.bspwm}/bin/bspc wm -r 
+    #   source $HOME/.config/bspwm/bspwmrc
+    # '';
   };
 
 #  services.xserver.displayManager.gdm.enable = true;
@@ -71,13 +82,19 @@
  };
 
  fileSystems."/home/hmaier/share" = {
-   device = "//192.168.178.99/nas/private_hdd/Share";
-   fsType = "cifs";
-   options = ["uid=1001" "gid=1001" "pass=sharingiscaring" "user=share"];
+	device = "//192.168.178.99/nas/private_hdd/Share";
+	fsType = "cifs";
+	options = [ "uid=1001" "gid=1001" "pass=sharingiscaring" "user=share" "rw" ];
+		# automount_opts = "x-systemd.automount, noauto, x-systemd.idle-timeout=60, x-systemd.device-timeout=5s, x-systemd.mount-timeout=5s";
+	# [ "${automount_opts}" "uid=1001" "gid=1001" "pass=sharingiscaring" "user=share"];
 
  };
-
-
+	
+	# Allow proprietary licence for following packages
+	nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+				 "steam"
+				 "steam-original"
+	];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -86,6 +103,7 @@
      bat
      brave
      bspwm
+	 steam
      cifs-utils
      curl
      doas
@@ -115,6 +133,8 @@
      xfce.xfce4-terminal
      yt-dlp
      zathura
+	 keepassxc
+	 wmname
 
    ];
 
@@ -131,10 +151,8 @@
 
   fonts.fonts = (with pkgs; [
     source-code-pro
+	nerdfonts
   ]);
-
-  
-
 
   # List services that you want to enable:
 
