@@ -22,6 +22,8 @@
 	extraConfig = ''
 		static ip_address=192.168.178.104/24
 		static routers=192.168.178.1
+		static domain_name_servers=192.168.178.1 8.8.8.8
+		noarp
 	'';
   };
 
@@ -33,11 +35,9 @@
     keyMap = "de-latin1";
   };
   services.xserver = {
-
     enable = true;
     layout = "de";
     xkbOptions = "eurosign:e,caps:escape";
-    
     desktopManager.xfce = {
       enable = true;
       enableXfwm = false;
@@ -54,11 +54,6 @@
       source $HOME/.config/bspwm/bspwmrc
       ${pkgs.bspwm}/bin/bspc wm -r 
     '';
-
-    # displayManager.sessionCommands = ''
-    #   ${pkgs.bspwm}/bin/bspc wm -r 
-    #   source $HOME/.config/bspwm/bspwmrc
-    # '';
   };
 
 #  services.xserver.displayManager.gdm.enable = true;
@@ -69,9 +64,6 @@
   # Enable sound.
   sound.enable = true;
   hardware.pulseaudio.enable = true;
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
  users.users.hmaier = {
@@ -94,15 +86,21 @@
 	nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
 				 "steam"
 				 "steam-original"
+				 "steam-run"
+				 "steamcmd"
 	];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
    environment.systemPackages = with pkgs; [
 
+	 duf
+	 font-manager
 	 keepassxc
 	 neovim
 	 steam
+	 steam-run
+	 steam-tui
 	 syncthing
 	 wmname
      bat
@@ -125,7 +123,6 @@
      openssl
      polybar
      python3
-	 font-manager
      rofi-wayland
      scrot
      sxhkd
