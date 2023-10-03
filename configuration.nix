@@ -100,10 +100,14 @@
   # $ nix search wget
    environment.systemPackages = with pkgs; [
 
+	 keepassxc
+	 neovim
+	 steam
+	 syncthing
+	 wmname
      bat
      brave
      bspwm
-	 steam
      cifs-utils
      curl
      doas
@@ -121,11 +125,11 @@
      openssl
      polybar
      python3
+	 font-manager
      rofi-wayland
      scrot
      sxhkd
      vim 
-	 neovim
      waybar
      wget
      xclip
@@ -133,8 +137,6 @@
      xfce.xfce4-terminal
      yt-dlp
      zathura
-	 keepassxc
-	 wmname
 
    ];
 
